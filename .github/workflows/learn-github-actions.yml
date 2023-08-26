@@ -1,0 +1,31 @@
+# 省略可能 - GitHub リポジトリの [アクション] タブに表示されるワークフローの名前。
+name: learn-github-actions
+# "省略可能" - ワークフローから生成されたワークフロー実行の名前。
+# github.actor: ワークフローの実行を最初にトリガーしたユーザーのユーザー名。
+run-name: ${{ github.actor }} is learning GitHub Actions
+# このワークフローのトリガーを指定します。
+on: [push]
+# learn-github-actions ワークフローで実行されるすべてのジョブをグループ化します。
+jobs:
+  # check-bats-version という名前のジョブを定義します。 子キーは、ジョブのプロパティを定義します。
+  check-bats-version:
+    # Ubuntu Linux ランナーの最新バージョンで実行されるようにジョブを構成します。
+    # これは、ジョブが GitHub によってホストされている新しい仮想マシンで実行されるということです。
+    runs-on: ubuntu-latest
+    # check-bats-version ジョブで実行されるすべてのステップをグループ化します。
+    # このセクションで入れ子になった各項目は、個別のアクションまたはシェル スクリプトです。
+    steps:
+      # uses キーワードは、このステップが actions/checkout アクションの v3 を実行することを指定します。
+      # これは、リポジトリをランナーにチェックアウトするアクションであり、コードに対してスクリプトまたは他のアクション (ビルド ツールやテスト ツールなど) を実行できます。
+      # チェックアウト アクションは、リポジトリのコードに対してワークフローが実行されるたびに使用する必要があります。
+      - uses: actions/checkout@v3
+      # このステップでは、actions/setup-node@v3 アクションを使用して、指定されたバージョン (この例では、v14 を使用) の Node.js をインストールします。
+      # これにより、node と npm の両方のコマンドが PATH にプッシュされます。
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "14"
+          # run キーワードは、ランナーでコマンドを実行するようにジョブに指示します。
+          # この場合は、npm を使用して bats ソフトウェア テスト パッケージをインストールします。
+      - run: npm install -g bats
+      # 最後に、ソフトウェアのバージョンを出力するパラメーターを指定して bats を実行します。
+      - run: bats -v
